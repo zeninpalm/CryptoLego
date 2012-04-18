@@ -1,1 +1,4 @@
-This file was created by PyCharm 2.0.2 for binding GitHub repository
+This is a cryptography library.
+I have no intention to replace Crypto++ with this, actually they have complete different targeting users.
+This library is easy to understand, easy to debug and easy to test. Just like lego toys, this is a simple
+and fun library.
