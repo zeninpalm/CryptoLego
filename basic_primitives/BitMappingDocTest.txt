@@ -1,0 +1,22 @@
+This is the 'doctest' file for BitMapping
+
+1. Test initialization
+>>> from BitMapping import *
+>>> bm = BitMapping()
+
+2. Fill mappings with all pairs
+>>> mapping_pairs  = [('1001','1100'),('1100','0101')]
+>>> bm.fill_with_pairs(mapping_pairs)
+>>> bm.dump_mapping()
+1100 --> 0101
+1001 --> 1100
+
+3. Extend the mapping
+>>> mapping_pair = ('1101', '0110')
+>>> bm.extend_with_pair(mapping_pair)
+>>> bm.dump_mapping()
+1100 --> 0101
+1001 --> 1100
+1101 --> 0110
+
+
