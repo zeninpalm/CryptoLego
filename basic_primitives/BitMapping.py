@@ -2,7 +2,7 @@
 BitMapping defines mapping operations.
 Such as the S-Boxes in DES, substitution in SPN network.
 """
-from BitVector import *
+from BitString import *
 
 class BitMapping(dict):
 
@@ -11,10 +11,10 @@ class BitMapping(dict):
 
     def __setitem__(self, key, val):
         if isinstance(val, type('')): #bitstring specified
-            dict.__setitem__(self, key, BitVector(bitstring=val))
+            dict.__setitem__(self, key, BitString(bitstring=val))
 
         elif isinstance(val, type(0)): #intVal specified
-            dict.__setitem__(self, key, BitVector(intVal=val))
+            dict.__setitem__(self, key, BitString(intVal=val))
 
         else:
             raise ValueError('''BitMapping constructor can only be
