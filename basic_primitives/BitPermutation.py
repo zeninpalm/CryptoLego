@@ -28,5 +28,6 @@ class BitPermutation:
             self._bitstring = self._bitstring.permute(self._permutation_list)
 
 if __name__ == '__main__':
-    print "In BitPermutation module"
+    import doctest
+    doctest.testfile('BitPermutationDocTest.txt')
 
