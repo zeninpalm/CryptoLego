@@ -7,19 +7,22 @@ from DataSource import DataSource
 from DataTarget import DataTarget
 from InputDataType import InputDataType
 from OutputDataType import OutputDataType
+from BitStringTaker import BitStringTaker
+from BitStringGiver import BitStringGiver
 
-class BitMapping(dict, DataSource, DataTarget):
+class BitMapping(dict, DataSource, DataTarget, BitStringTaker, BitStringGiver):
 
     def __init__(self, *args, **kwargs):
+        DataSource.__init__(self)
+        DataTarget.__init__(self)
+        BitStringTaker.__init__(self, None)
+        BitStringGiver.__init__(self, None)
+
+        DataSource.register_handler(self, OutputDataType.bit_string, self._output_bitstring_handler)
+        DataTarget.register_handler(self, InputDataType.bit_string, self._input_bitstring_handler)
+
         self.update(*args, **kwargs)
-
         self._data_source = None
-
-        self._output_handlers = {OutputDataType.bit_string:self._output_bitstring_handler}
-        self._output_bitstring = None
-
-        self._input_handlers = {InputDataType.bit_string:self._input_bitstring_handler}
-        self._input_bitstring = None
 
 
     def __getitem__(self, item):
