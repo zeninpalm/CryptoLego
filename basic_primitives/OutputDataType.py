@@ -1,6 +1,6 @@
 __author__ = 'ThinkPad'
 
-class OutputDataType:
+class OutputDataType(object):
     bit_string = 0
     group_element = 1
     ring_element = 2

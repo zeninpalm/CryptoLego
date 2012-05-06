@@ -1,9 +1,23 @@
 __author__ = 'ThinkPad'
 
-class DataTarget:
-    def set_input(self, data_source, input_type):
-        self._data_source = data_source
+from InputDataType import InputDataType
+
+class DataTarget(object):
+    def __init__(self):
+        self._input_handlers = {}
+        self._data_source = None
 
     def apply(self):
         pass
 
+    def register_input_handler(self, input_type, handler):
+        self._input_handlers[input_type] = handler
+
+    def set_input(self, data_source, input_type=None):
+        """
+        bitstring is default input data type
+        """
+        self._data_source = data_source
+        if input_type is None:
+            input_type = InputDataType.bit_string
+        self._input_handlers[input_type]()

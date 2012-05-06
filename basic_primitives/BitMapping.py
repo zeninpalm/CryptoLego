@@ -3,27 +3,18 @@ BitMapping defines mapping operations.
 Such as the S-Boxes in DES, substitution in SPN network.
 """
 from BitString import *
-from DataSource import DataSource
-from DataTarget import DataTarget
 from InputDataType import InputDataType
 from OutputDataType import OutputDataType
-from BitStringTaker import BitStringTaker
-from BitStringGiver import BitStringGiver
+from BitStringTarget import BitStringTarget
+from BitStringSource import BitStringSource
 
-class BitMapping(dict, DataSource, DataTarget, BitStringTaker, BitStringGiver):
+class BitMapping(dict, BitStringTarget, BitStringSource):
 
     def __init__(self, *args, **kwargs):
-        DataSource.__init__(self)
-        DataTarget.__init__(self)
-        BitStringTaker.__init__(self, None)
-        BitStringGiver.__init__(self, None)
-
-        DataSource.register_handler(self, OutputDataType.bit_string, self._output_bitstring_handler)
-        DataTarget.register_handler(self, InputDataType.bit_string, self._input_bitstring_handler)
-
         self.update(*args, **kwargs)
-        self._data_source = None
 
+        BitStringSource.__init__(self, None)
+        BitStringTarget.__init__(self, None)
 
     def __getitem__(self, item):
         if isinstance(item, type('')):
@@ -49,36 +40,11 @@ class BitMapping(dict, DataSource, DataTarget, BitStringTaker, BitStringGiver):
         for k, v in dict(*args, **kwargs).iteritems():
             self[k] = v
 
-    # Section of data input handlers
-    def set_input(self, data_source, input_type=None):
-        """
-        bitstring is default input data type
-        """
-        self._data_source = data_source
-        if input_type is None:
-            input_type = InputDataType.bit_string
-        return self._input_handlers[input_type]()
-
-    def _input_bitstring_handler(self):
-        """
-        This function takes bitstring format input
-        """
-        self._input_bitstring = self._data_source.provide_data(OutputDataType.bit_string)
-
-
-    # Section of data output handlers
-    def provide_data(self, output_type=None):
-        """
-        bitstring is default output data type
-        """
-        if output_type is None:
-            output_type = OutputDataType.bit_string
-        return self._output_handlers[output_type]()
-
-    def _output_bitstring_handler(self):
+    def output_bit_string_handler(self, other_info=None):
         return self._output_bitstring
 
     def apply(self):
+
         self._output_bitstring = self[self._input_bitstring]
 
 
