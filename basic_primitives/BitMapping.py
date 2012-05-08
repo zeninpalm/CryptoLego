@@ -3,18 +3,15 @@ BitMapping defines mapping operations.
 Such as the S-Boxes in DES, substitution in SPN network.
 """
 from BitString import *
-from InputDataType import InputDataType
-from OutputDataType import OutputDataType
-from BitStringTarget import BitStringTarget
-from BitStringSource import BitStringSource
+import signal_slot
+from signal_slot import SignalSupporter, slot_supporter
 
-class BitMapping(dict, BitStringTarget, BitStringSource):
+@SignalSupporter('bitstring')
+class BitMapping(dict):
 
+    @slot_supporter('bitstring', 'intvalue')
     def __init__(self, *args, **kwargs):
         self.update(*args, **kwargs)
-
-        BitStringSource.__init__(self, None)
-        BitStringTarget.__init__(self, None)
 
     def __getitem__(self, item):
         if isinstance(item, type('')):
@@ -40,8 +37,13 @@ class BitMapping(dict, BitStringTarget, BitStringSource):
         for k, v in dict(*args, **kwargs).iteritems():
             self[k] = v
 
-    def output_bit_string_handler(self, other_info=None):
-        return self._output_bitstring
+    def bitstring_handler(self, **bitstring):
+        self._input_bitstring = bitstring['bitstring']
+        self.apply()
+
+    def intvalue_handler(self, **intvalue):
+        self._input_bitstring = intvalue['intvalue']
+        self.apply()
 
     def apply(self):
 
@@ -49,21 +51,18 @@ class BitMapping(dict, BitStringTarget, BitStringSource):
 
 
 if __name__ == '__main__':
-    class Foo(DataSource):
-        def provide_data(self, output_type):
-            return str(BitString(bitstring='1001'))
 
-    class Bar(DataSource):
-        def provide_data(self, output_type):
-            return str(BitString(bitstring='0000'))
+    @SignalSupporter('bitstring', 'intvalue')
+    class Foo(object):
+        pass
 
-    bm = BitMapping({'1001':'1100', '0000':'1111'})
+    bm = BitMapping({'1001':'1100', '0001':'1111', '1101':'1000', '0111':'1011'})
     f = Foo()
-    bm.set_input(f, InputDataType.bit_string)
-    bm.apply()
-    print bm.provide_data(OutputDataType.bit_string)
+    signal_slot.connect(f, 'bitstring', bm, 'bitstring')
+    signal_slot.connect(f, 'intvalue', bm, 'intvalue')
 
-    b = Bar()
-    bm.set_input(b, InputDataType.bit_string)
-    bm.apply()
-    print bm.provide_data(OutputDataType.bit_string)
+    f.emit('bitstring', bitstring='1001')
+    print bm._output_bitstring
+
+    f.emit('intvalue', intvalue=9)
+    print bm._output_bitstring
