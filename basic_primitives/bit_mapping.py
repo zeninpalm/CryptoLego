@@ -2,7 +2,7 @@
 BitMapping defines mapping operations.
 Such as the S-Boxes in DES, substitution in SPN network.
 """
-from BitString import *
+from bit_string import *
 import signal_slot
 from signal_slot import SignalSupporter, slot_supporter
 
@@ -40,6 +40,7 @@ class BitMapping(dict):
     def bitstring_handler(self, **bitstring):
         self._input_bitstring = bitstring['bitstring']
         self.apply()
+        self.emit('bitstring', bitstring=str(self._output_bitstring))
 
     def intvalue_handler(self, **intvalue):
         self._input_bitstring = intvalue['intvalue']
@@ -51,18 +52,23 @@ class BitMapping(dict):
 
 
 if __name__ == '__main__':
+    from bit_permutation import BitPermutation
 
     @SignalSupporter('bitstring', 'intvalue')
     class Foo(object):
         pass
 
     bm = BitMapping({'1001':'1100', '0001':'1111', '1101':'1000', '0111':'1011'})
+    bp = BitPermutation([3, 0, 1, 2])
     f = Foo()
+
     signal_slot.connect(f, 'bitstring', bm, 'bitstring')
-    signal_slot.connect(f, 'intvalue', bm, 'intvalue')
+    signal_slot.connect(bm, 'bitstring', bp, 'bitstring')
+
+    f.emit('bitstring', bitstring='0111')
+    print bm._output_bitstring
+    print bp._output_bitstring
 
     f.emit('bitstring', bitstring='1001')
     print bm._output_bitstring
-
-    f.emit('intvalue', intvalue=9)
-    print bm._output_bitstring
+    print bp._output_bitstring
