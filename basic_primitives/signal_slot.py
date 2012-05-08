@@ -32,9 +32,9 @@ def slot_supporter(*args):
     code_to_eval = '{' + dict_str + '}'
 
     def outer(func):
-        def wrapped_init(self, *args):
+        def wrapped_init(self, *args, **kwargs):
             self._slots = eval(code_to_eval)
-            func(self, *args)
+            func(self, *args, **kwargs)
 
         return wrapped_init
     return outer
