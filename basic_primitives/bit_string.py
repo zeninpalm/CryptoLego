@@ -35,7 +35,7 @@ class BitStringDivider(object):
         """
         self._input_bitstring = BitString(**kwargs)
         self.apply()
-        self.emit('bitstring_list', bitstring=self._bitstrings)
+        self.emit('bitstring_list', bitstring_list=self._bitstrings)
 
     def apply(self):
         """
