@@ -50,6 +50,14 @@ class BitMapping(dict):
 
         self._output_bitstring = self[self._input_bitstring]
 
+@SignalSupporter('bitstring_list')
+class BitMappingGroup(object):
+    @slot_supporter('bitstring_list')
+    def __init__(self, bitmappings):
+        pass
+
+    def bitstring_list_handler(self, **kwargs):
+        pass
 
 if __name__ == '__main__':
     from bit_permutation import BitPermutation
