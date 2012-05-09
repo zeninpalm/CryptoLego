@@ -11,17 +11,14 @@ class BitString(BitVector):
     @slot_supporter('bitstring', 'intvalue')
     def __init__(self, *args, **kwargs):
         BitVector.__init__(self, *args, **kwargs)
-        self._input_bitstring = None
-        self._output_bitstring = None
 
     def bitstring_handler(self, **kwargs):
-        self._input_bitstring = BitString(**kwargs)
-        self._output_bitstring = BitString(**kwargs)
-        self.emit('bitstring', bitstring=str(self._input_bitstring))
+        self.__init__(**kwargs)
+        self.emit('bitstring', bitstring=str(self))
 
     def intvalue_handler(self, **kwargs):
-        self._input_bitstring = BitString(**kwargs)
-        self.emit('intvalue', intvalue=str(self._input_bitstring))
+        self._init__(**kwargs)
+        self.emit('intvalue', intvalue=str(self))
 
 @SignalSupporter('bitstring_list')
 class BitStringDivider(object):
@@ -66,6 +63,8 @@ class BitStringCombiner(object):
 
         """
         self._input_bitstring_list = kwargs['bitstring_list']
+        self.apply()
+        self.emit('bitstring', bitstring=self._output_bitstring)
 
     def apply(self):
         if len(self._combine_list) == 0:
@@ -94,7 +93,7 @@ if __name__ == '__main__':
 
     signal_slot.connect(s, 'bitstring', bs, 'bitstring')
     s.emit('bitstring', bitstring='10011')
-    print bs._output_bitstring
+    print bs
 
     bd = BitStringDivider([3,4], [0, 2, 1], [7, 5, 6])
     bd.bitstring_handler(bitstring='10110010')
