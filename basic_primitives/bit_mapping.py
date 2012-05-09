@@ -27,8 +27,7 @@ class BitMapping(dict):
             dict.__setitem__(self, key, BitString(bitstring=val))
 
         elif isinstance(val, type(0)): #intVal specified
-            val_bin = bin(val)
-            dict.__setitem__(self, key, BitString(intVal=val_bin[2:]))
+            dict.__setitem__(self, key, BitString(intvalue=val))
 
         else:
             raise ValueError('''BitMapping only supports bitstring or integer index value''')
@@ -36,6 +35,7 @@ class BitMapping(dict):
     def update(self, *args, **kwargs):
         for k, v in dict(*args, **kwargs).iteritems():
             self[k] = v
+            self._output_len = len(v)
 
     def bitstring_handler(self, **bitstring):
         self._input_bitstring = bitstring['bitstring']
@@ -48,6 +48,9 @@ class BitMapping(dict):
 
     def apply(self):
         self._output_bitstring = self[self._input_bitstring]
+
+    def output_len(self):
+        return self._output_len
 
 @SignalSupporter('bitstring_list')
 class BitMappingGroup(object):
@@ -63,10 +66,10 @@ class BitMappingGroup(object):
 
             #Initialize an empty bitstring whose size equals to mapped bitstring length
             # Dirty Trick, fix this!!!!!!!!!!!!!!!!!******************************
-            resulted_bitstring = self._bitmappings[index][str(bitstrings[index])]
-            resulted_bitstrings.append(resulted_bitstring)
-
+            resulted_bitstring = BitString(size=self._bitmappings[index].output_len())
+            signal_slot.connect(self._bitmappings[index], 'bitstring', resulted_bitstring, 'bitstring')
             bitstrings[index].emit('bitstring', bitstring=str(bitstrings[index]))
+            resulted_bitstrings.append(resulted_bitstring)
 
         self.emit('bitstring_list', bitstring_list=resulted_bitstrings)
 
@@ -80,6 +83,7 @@ if __name__ == '__main__':
         pass
 
     bm = BitMapping({'1001':'1100', '0001':'1111', '1101':'1000', '0111':'1011'})
+    print 'Output len: %s' % bm.output_len()
     bp = BitPermutation([3, 0, 1, 2])
     f = Foo()
 
