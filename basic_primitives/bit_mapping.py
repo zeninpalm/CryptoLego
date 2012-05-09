@@ -47,21 +47,25 @@ class BitMapping(dict):
         self.apply()
 
     def apply(self):
-
         self._output_bitstring = self[self._input_bitstring]
 
 @SignalSupporter('bitstring_list')
 class BitMappingGroup(object):
     @slot_supporter('bitstring_list')
-    def __init__(self, bitmappings):
-        pass
+    def __init__(self, *bitmappings):
+        self._bitmappings = bitmappings
 
     def bitstring_list_handler(self, **kwargs):
-        pass
+        bitstrings = kwargs['bitstring_list']
+        for index in range(0, len(bitstrings)):
+            signal_slot.connect(bitstrings[index], 'bitstring', self._bitmappings[index], 'bitstring')
+            bitstrings[index].emit('bitstring', bitstring=str(bitstrings[index]))
 
 if __name__ == '__main__':
     from bit_permutation import BitPermutation
 
+    # Begin test of simple bitstring mapping
+    print 'Testing BitMapping'
     @SignalSupporter('bitstring', 'intvalue')
     class Foo(object):
         pass
@@ -80,3 +84,19 @@ if __name__ == '__main__':
     f.emit('bitstring', bitstring='1001')
     print bm._output_bitstring
     print bp._output_bitstring
+    print 'End of BitMapping testing'
+    # End of testing
+
+    # Testing of BitMappingGroup
+    print 'Testing BitMappingGroup'
+    bss = [BitString(bitstring='1001'), BitString(bitstring='1101'), BitString(bitstring='001')]
+    bm1 = BitMapping({'1001':'0000'})
+    bm2 = BitMapping({'1101':'0111'})
+    bm3 = BitMapping({'001':'010'})
+    bg = BitMappingGroup(bm1, bm2, bm3)
+    bg.bitstring_list_handler(bitstring_list=bss)
+    print bm1._output_bitstring
+    print bm2._output_bitstring
+    print bm3._output_bitstring
+    print 'End of BitMappingGroup testing'
+    # End of testing
