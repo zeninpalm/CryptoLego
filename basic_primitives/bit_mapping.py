@@ -57,9 +57,18 @@ class BitMappingGroup(object):
 
     def bitstring_list_handler(self, **kwargs):
         bitstrings = kwargs['bitstring_list']
+        resulted_bitstrings = []
         for index in range(0, len(bitstrings)):
             signal_slot.connect(bitstrings[index], 'bitstring', self._bitmappings[index], 'bitstring')
+
+            #Initialize an empty bitstring whose size equals to mapped bitstring length
+            # Dirty Trick, fix this!!!!!!!!!!!!!!!!!******************************
+            resulted_bitstring = self._bitmappings[index][str(bitstrings[index])]
+            resulted_bitstrings.append(resulted_bitstring)
+
             bitstrings[index].emit('bitstring', bitstring=str(bitstrings[index]))
+
+        self.emit('bitstring_list', bitstring_list=resulted_bitstrings)
 
 if __name__ == '__main__':
     from bit_permutation import BitPermutation
@@ -100,3 +109,28 @@ if __name__ == '__main__':
     print bm3._output_bitstring
     print 'End of BitMappingGroup testing'
     # End of testing
+
+    # Testing of BitMappingGroup+BitStringDivider
+    print 'Testing BitMappingGroup + BitStringDivider'
+    from bit_string import BitStringDivider
+    bm1 = BitMapping({'1001':'0001'})
+    bm2 = BitMapping({'1101':'1110'})
+    bm3 = BitMapping({'001':'110'})
+    bg = BitMappingGroup(bm1, bm2, bm3)
+
+    bsd = BitStringDivider([0,1,2,3],[4,5,6,7],[8,9,10])
+    signal_slot.connect(bsd, 'bitstring_list', bg, 'bitstring_list')
+    bsd.bitstring_handler(bitstring='10011101001')
+
+    print 'Origianl bitstring = ', '10011101001'
+    print 'Mapped to = ', '00011110110'
+    print '[0,1,2,3]:', bm1._output_bitstring
+    print '[4,5,6,7]:',bm2._output_bitstring
+    print '[8,9,10]', bm3._output_bitstring
+
+    bsc = BitStringCombiner(2,0,1)
+    signal_slot.connect(bg, 'bitstring_list', bsc, 'bitstring_list')
+    bsd.bitstring_handler(bitstring='10011101001')
+    print 'combined to:'
+    print bsc._output_bitstring
+    print 'End of BitMappingGroup + BitStringDivider testing'
